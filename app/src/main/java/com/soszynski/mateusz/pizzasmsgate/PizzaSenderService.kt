@@ -22,7 +22,7 @@ class PizzaSenderService : IntentService("PizzaSenderService") {
                 handleActionSendMessage(number, message)
             }
             ACTION_BUILD_AND_SEND_MESSAGE -> {
-                if(intent.getBooleanExtra(MAIN_BUTTON, false)){
+                if (intent.getBooleanExtra(MAIN_BUTTON, false)) {
                     val pref = PreferenceManager.getDefaultSharedPreferences(this)
                     val number: String = pref.getString("edit_text_preference_number", "0")
                     val message: String =
@@ -34,13 +34,13 @@ class PizzaSenderService : IntentService("PizzaSenderService") {
         }
     }
 
-    private fun canSms(): Boolean{
+    private fun canSms(): Boolean {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) ==
                 PackageManager.PERMISSION_GRANTED
     }
 
     private fun handleActionSendMessage(number: String, message: String) {
-        if(canSms()) {
+        if (canSms()) {
             val smsManager: SmsManager = SmsManager.getDefault()
             smsManager.sendTextMessage(
                     number,
@@ -50,15 +50,14 @@ class PizzaSenderService : IntentService("PizzaSenderService") {
                     null)
             Log.i(TAG, "Sms was sent, number: $number , message: $message")
 
-            if(
+            if (
                     PreferenceManager
                             .getDefaultSharedPreferences(applicationContext)
                             .getBoolean("notification_on_send", true)
             ) {
                 SmallNotification.notify(this, getString(R.string.message_sent_notification_title))
             }
-        }
-        else{
+        } else {
             SmallNotification.notify(this, getString(R.string.message_not_sent_notification_title))
         }
     }
