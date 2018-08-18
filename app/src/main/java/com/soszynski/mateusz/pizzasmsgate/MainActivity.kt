@@ -1,0 +1,99 @@
+package com.soszynski.mateusz.pizzasmsgate
+
+import android.Manifest
+import android.app.AlertDialog
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Bundle
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
+import android.support.v7.app.AppCompatActivity
+import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_main.*
+
+
+class MainActivity : AppCompatActivity() {
+
+    fun canSms(): Boolean {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) ==
+                PackageManager.PERMISSION_GRANTED
+    }
+
+    fun askForPermission() {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage(getString(R.string.sms_privilege_needed))
+        builder.setNeutralButton("OK") { dialog, which ->
+            ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.SEND_SMS),
+                    1)
+        }
+        builder.create().show()
+    }
+
+    fun updateBox() {
+        if (canSms()) {
+            button_permission_box.setBackgroundResource(R.drawable.rounded_button_green)
+            button_permission_box.text = getString(R.string.sms_permission_good_box)
+        } else {
+            button_permission_box.setBackgroundResource(R.drawable.rounded_button_red)
+            button_permission_box.text = getString(R.string.sms_permission_bad_box)
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        startService(Intent(this, PizzaListenerService::class.java))
+
+        updateBox()
+        if (!canSms()) {
+            askForPermission()
+        }
+
+        button_permission_box.setOnClickListener {
+            if (!canSms()) {
+                askForPermission()
+            } else {
+                Toast.makeText(this,
+                        getString(R.string.sms_permission_good_box),
+                        Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        button_order.setOnClickListener {
+            PizzaSenderService.startActionBuildAndSendMessage(this, true, false, false)
+            if (canSms()) {
+                Toast.makeText(
+                        this,
+                        getString(R.string.message_sent),
+                        Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(
+                        this,
+                        getString(R.string.sms_permission_bad_box),
+                        Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        button_settings.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
+
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        if (requestCode == 1) {
+            // If request is cancelled, the result arrays are empty.
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                Toast.makeText(this, getString(R.string.thank_you), Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, getString(R.string.sms_denied), Toast.LENGTH_SHORT).show()
+            }
+            updateBox()
+        }
+    }
+
+}

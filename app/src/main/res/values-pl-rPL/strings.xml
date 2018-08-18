@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pizza SMS gate</string>
+    <string name="sms_privilege_needed">Będe potrzebował dostępu do SMS aby zamawiać pizze za ich pomocą.</string>
+    <string name="sms_denied">Aplikacja nie będzie działać bez dostępu do SMS\'ów</string>
+    <string name="thank_you">Dziękuje!</string>
+    <string name="sms_permission_bad_box">✕ Aplikacja nie ma dostępu do SMS\'ów!</string>
+    <string name="sms_permission_good_box">✓ Dostęp do SMS\'ów przyznany.</string>
+    <string name="settings">Ustawienia</string>
+    <string name="order_default">Zamów pizze</string>
+    <string name="message_sent">Wiadomość została wysłana!</string>
+
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- General settings -->
+    <string name="pref_header_general">Ogólne</string>
+
+    <string name="pref_title_notification_on_send">Powiadomienie przy wysłaniu</string>
+    <string name="pref_description_notification_on_send">
+        Powiadom mnie, kiedy wiadomość zostanie wysłana
+    </string>
+
+    <string name="pref_title_number">Numer pizzerii.</string>
+
+    <string name="pref_title_message">Wiadomość, która zostanie wysłana</string>
+    <string name="pref_default_message">
+        Dzień dobry! Chciałbym zamówić pizze [pizza] z dostawą na adres [address].
+    </string>
+
+    <string name="message_sent_notification_title">Wiadomość została wysłana</string>
+    <string name="message_not_sent_notification_title">Wiadomość NIE została wysłana!</string>
+</resources>
