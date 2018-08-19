@@ -3,8 +3,11 @@ package com.soszynski.mateusz.pizzasmsgate
 import android.app.IntentService
 import android.app.Service
 import android.content.Intent
+import android.preference.PreferenceManager
 import android.util.Log
 import fi.iki.elonen.NanoHTTPD
+import org.json.JSONException
+import org.json.JSONObject
 
 
 class PizzaListenerService : IntentService("PizzaListenerService") {
@@ -41,12 +44,26 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
                            files: Map<String, String>?): NanoHTTPD.Response {
             if (files!!.isNotEmpty()) {
                 files.forEach { t, u ->
-                    Log.i(TAG, "File given by http: $u")
+                    try {
+                        val json: JSONObject = JSONObject(u)
+                        val main = json.getBoolean("main")
+                        val left = json.getBoolean("left")
+                        val right = json.getBoolean("right")
+                        PizzaSenderService
+                                .startActionBuildAndSendMessage(applicationContext, main, left, right)
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
+                    }
                 }
             }
-            val answer = "<html><body>\n<h1>Hello server</h1>\n</body></html>\n"
+            var json: JSONObject = JSONObject()
+            val pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+            json.put("ssid", pref.getString("edit_text_preference_button_ssid", ""))
+            json.put("password", pref.getString("edit_text_preference_button_password", ""))
 
-            return NanoHTTPD.Response(answer)
+            val res: NanoHTTPD.Response = NanoHTTPD.Response(json.toString())
+            res.mimeType = "text/json"
+            return res
         }
     }
 }

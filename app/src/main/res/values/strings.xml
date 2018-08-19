@@ -29,6 +29,11 @@
         Hello! I would like to order [pizza] pizza with a delivery to [address].
     </string>
 
+    <!-- Button config settings -->
+    <string name="pref_header_button_config">Konfiguracja przycisku</string>
+    <string name="pref_title_button_ssid">WiFi name that button will connect to</string>
+    <string name="pref_title_button_password">WiFi password that button will connect to</string>
+
     <string name="message_sent_notification_title">Message was sent</string>
     <string name="message_not_sent_notification_title">Message WASN\'T sent!</string>
 </resources>

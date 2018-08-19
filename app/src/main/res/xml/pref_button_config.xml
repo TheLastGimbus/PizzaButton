@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:defaultValue="[name]"
+        android:key="edit_text_preference_button_ssid"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_button_ssid" />
+    <EditTextPreference
+        android:defaultValue="[password]"
+        android:key="edit_text_preference_button_password"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_button_password" />
+</PreferenceScreen>

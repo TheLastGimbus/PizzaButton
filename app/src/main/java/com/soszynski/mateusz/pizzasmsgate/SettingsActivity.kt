@@ -44,6 +44,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
     override fun isValidFragment(fragmentName: String): Boolean {
         return PreferenceFragment::class.java.name == fragmentName
                 || GeneralPreferenceFragment::class.java.name == fragmentName
+                || ButtonConfigPreferenceFragment::class.java.name == fragmentName
     }
 
     /**
@@ -63,6 +64,31 @@ class SettingsActivity : AppCompatPreferenceActivity() {
             // guidelines.
             bindPreferenceSummaryToValue(findPreference("edit_text_preference_number"))
             bindPreferenceSummaryToValue(findPreference("edit_text_preference_message"))
+        }
+
+        override fun onOptionsItemSelected(item: MenuItem): Boolean {
+            val id = item.itemId
+            if (id == android.R.id.home) {
+                startActivity(Intent(activity, SettingsActivity::class.java))
+                return true
+            }
+            return super.onOptionsItemSelected(item)
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    class ButtonConfigPreferenceFragment : PreferenceFragment() {
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            addPreferencesFromResource(R.xml.pref_button_config)
+            setHasOptionsMenu(true)
+
+            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
+            // to their values. When their values change, their summaries are
+            // updated to reflect the new value, per the Android Design
+            // guidelines.
+            bindPreferenceSummaryToValue(findPreference("edit_text_preference_button_ssid"))
+            bindPreferenceSummaryToValue(findPreference("edit_text_preference_button_password"))
         }
 
         override fun onOptionsItemSelected(item: MenuItem): Boolean {

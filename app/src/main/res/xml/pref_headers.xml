@@ -7,4 +7,9 @@
         android:icon="@drawable/ic_local_pizza_black_24dp"
         android:title="@string/pref_header_general" />
 
+    <header
+        android:fragment="com.soszynski.mateusz.pizzasmsgate.SettingsActivity$ButtonConfigPreferenceFragment"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="@string/pref_header_button_config" />
+
 </preference-headers>
