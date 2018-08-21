@@ -43,12 +43,18 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
                            parameters: Map<String, String>?,
                            files: Map<String, String>?): NanoHTTPD.Response {
             if (files!!.isNotEmpty()) {
+                val pref =
+                        PreferenceManager.getDefaultSharedPreferences(applicationContext)
                 files.forEach { t, u ->
                     try {
                         val json: JSONObject = JSONObject(u)
                         val main = json.getBoolean("main")
                         val left = json.getBoolean("left")
                         val right = json.getBoolean("right")
+                        val voltage = json.getDouble("voltage")
+                        pref.edit()
+                                .putFloat("button_voltage", voltage.toFloat())
+                                .apply()
                         PizzaSenderService
                                 .startActionBuildAndSendMessage(applicationContext, main, left, right)
                     } catch (e: JSONException) {

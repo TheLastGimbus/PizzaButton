@@ -9,6 +9,7 @@
     <string name="settings">Ustawienia</string>
     <string name="order_default">Zamów pizze</string>
     <string name="message_sent">Wiadomość została wysłana!</string>
+    <string name="button_battery">Poziom naładownia przycisku</string>
 
     <string name="title_activity_settings">Settings</string>
 

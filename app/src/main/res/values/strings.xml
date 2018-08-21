@@ -9,6 +9,7 @@
     <string name="settings">Settings</string>
     <string name="order_default">Order pizza</string>
     <string name="message_sent">Message was sent!</string>
+    <string name="button_battery">Button battery level</string>
 
     <string name="title_activity_settings">Settings</string>
 
