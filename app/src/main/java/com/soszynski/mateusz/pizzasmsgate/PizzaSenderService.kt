@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.preference.PreferenceManager
 import android.support.v4.content.ContextCompat
+import android.telephony.PhoneNumberUtils
 import android.telephony.SmsManager
 import android.util.Log
 
@@ -41,8 +42,13 @@ class PizzaSenderService : IntentService("PizzaSenderService") {
 
     private fun handleActionSendMessage(number: String, message: String) {
         if (canSms()) {
-            val smsManager: SmsManager = SmsManager.getDefault()
-            smsManager.sendTextMessage(
+            if (!PhoneNumberUtils.isGlobalPhoneNumber(number)) {
+                SmallNotification.notify(this, getString(R.string.message_not_sent_notification_title))
+                Log.i(TAG, "Sms not send because number is wrong!")
+                return
+            }
+
+            SmsManager.getDefault().sendTextMessage(
                     number,
                     null,
                     message,
@@ -50,13 +56,13 @@ class PizzaSenderService : IntentService("PizzaSenderService") {
                     null)
             Log.i(TAG, "Sms was sent, number: $number , message: $message")
 
-            if (
-                    PreferenceManager
+            if (PreferenceManager
                             .getDefaultSharedPreferences(applicationContext)
                             .getBoolean("notification_on_send", true)
             ) {
                 SmallNotification.notify(this, getString(R.string.message_sent_notification_title))
             }
+
         } else {
             SmallNotification.notify(this, getString(R.string.message_not_sent_notification_title))
         }

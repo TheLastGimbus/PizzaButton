@@ -7,7 +7,7 @@ import android.content.Intent
 class BootUpReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        val intent = Intent(context, PizzaListenerService::class.java)
-        context.startService(intent)
+        val serviceIntent = Intent(context, PizzaListenerService::class.java)
+        context.startService(serviceIntent)
     }
 }

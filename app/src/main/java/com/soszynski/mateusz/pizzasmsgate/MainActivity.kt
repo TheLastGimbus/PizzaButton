@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     fun askForPermission() {
         val builder = AlertDialog.Builder(this)
         builder.setMessage(getString(R.string.sms_privilege_needed))
-        builder.setNeutralButton("OK") { dialog, which ->
+        builder.setNeutralButton("OK") { _, _ ->
             ActivityCompat.requestPermissions(this,
                     arrayOf(Manifest.permission.SEND_SMS),
                     1)
