@@ -1,4 +1,4 @@
-package com.soszynski.mateusz.pizzasmsgate
+package com.soszynski.mateusz.pizzabutton
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4

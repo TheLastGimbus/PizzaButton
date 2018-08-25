@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.soszynski.mateusz.pizzasmsgate">
+    package="com.soszynski.mateusz.pizzabutton">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light">
 
-        <activity android:name=".MainActivity">
+        <activity android:name="com.soszynski.mateusz.pizzabutton.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,16 +26,16 @@
         </activity>
 
         <activity
-            android:name=".SettingsActivity"
+            android:name="com.soszynski.mateusz.pizzabutton.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName="com.soszynski.mateusz.pizzabutton.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.soszynski.mateusz.pizzasmsgate.MainActivity" />
+                android:value="com.soszynski.mateusz.pizzabutton.MainActivity" />
         </activity>
 
         <receiver
-            android:name=".BootUpReceiver"
+            android:name="com.soszynski.mateusz.pizzabutton.BootUpReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -46,10 +46,10 @@
         </receiver>
 
         <service
-            android:name=".PizzaListenerService"
+            android:name="com.soszynski.mateusz.pizzabutton.PizzaListenerService"
             android:exported="false" />
         <service
-            android:name=".PizzaSenderService"
+            android:name="com.soszynski.mateusz.pizzabutton.PizzaSenderService"
             android:exported="false" />
     </application>
 

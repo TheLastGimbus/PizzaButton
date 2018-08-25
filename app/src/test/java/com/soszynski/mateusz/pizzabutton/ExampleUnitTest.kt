@@ -1,4 +1,4 @@
-package com.soszynski.mateusz.pizzasmsgate
+package com.soszynski.mateusz.pizzabutton
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Pizza SMS gate</string>
+    <string name="app_name">Pizza Button</string>
     <string name="sms_privilege_needed">Będe potrzebował dostępu do SMS aby zamawiać pizze za ich pomocą.</string>
     <string name="sms_denied">Aplikacja nie będzie działać bez dostępu do SMS\'ów</string>
     <string name="thank_you">Dziękuje!</string>

@@ -1,4 +1,4 @@
-package com.soszynski.mateusz.pizzasmsgate
+package com.soszynski.mateusz.pizzabutton
 
 import android.annotation.TargetApi
 import android.content.Context
