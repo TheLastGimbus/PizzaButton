@@ -3,6 +3,7 @@ package com.soszynski.mateusz.pizzabutton
 import android.Manifest
 import android.app.AlertDialog
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -29,10 +30,11 @@ class MainActivity : AppCompatActivity() {
                     arrayOf(Manifest.permission.SEND_SMS),
                     1)
         }
-        builder.create().show()
+        builder.create()
+        builder.show()
     }
 
-    fun updateBox() {
+    fun updateSmsPermissionBox() {
         if (canSms()) {
             button_permission_box.setBackgroundResource(R.drawable.rounded_button_green)
             button_permission_box.text = getString(R.string.sms_permission_good_box)
@@ -70,16 +72,21 @@ class MainActivity : AppCompatActivity() {
 
         startService(Intent(this, PizzaListenerService::class.java))
 
-        updateBox()
+        updateSmsPermissionBox()
         if (!canSms()) {
             askForPermission()
         }
 
         updateBattery()
-        linearLayoutBattery.setOnClickListener {
-            // yes, this is stupid as hell
-            updateBattery()
-        }
+        val pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        val listener = SharedPreferences
+                .OnSharedPreferenceChangeListener { sharedPreferences, key ->
+                    if (key == "button_voltage") {
+                        updateBattery()
+                    }
+                }
+        pref.registerOnSharedPreferenceChangeListener(listener)
+
 
         button_permission_box.setOnClickListener {
             if (!canSms()) {
@@ -91,7 +98,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        button_order.setOnClickListener {
+        // safer than normal click
+        button_order.setOnLongClickListener {
             PizzaSenderService.startActionBuildAndSendMessage(this, true, false, false)
             if (canSms()) {
                 Toast.makeText(
@@ -104,7 +112,9 @@ class MainActivity : AppCompatActivity() {
                         getString(R.string.sms_permission_bad_box),
                         Toast.LENGTH_SHORT).show()
             }
+            return@setOnLongClickListener true
         }
+
 
         button_settings.setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
@@ -122,7 +132,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, getString(R.string.sms_denied), Toast.LENGTH_SHORT).show()
             }
-            updateBox()
+            updateSmsPermissionBox()
         }
     }
 
