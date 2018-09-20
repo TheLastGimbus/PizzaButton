@@ -31,7 +31,7 @@
     </string>
 
     <!-- Button config settings -->
-    <string name="pref_header_button_config">Konfiguracja przycisku</string>
+    <string name="pref_header_button_config">Button configuration</string>
     <string name="pref_title_button_ssid">WiFi name that button will connect to</string>
     <string name="pref_title_button_password">WiFi password that button will connect to</string>
 
