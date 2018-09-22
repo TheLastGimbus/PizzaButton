@@ -16,7 +16,7 @@ import org.json.JSONObject
 class PizzaListenerService : IntentService("PizzaListenerService") {
     private val TAG = "PizzaListenerService"
     private val TAG_MDNS = "MDNS"
-    private val PORT = 8080
+    private val PORT = 8182
     private var server: WebServer? = null
 
     override fun onHandleIntent(intent: Intent?) {}
@@ -30,6 +30,7 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
     private val mRegistrationListener = object : NsdManager.RegistrationListener {
 
         override fun onServiceRegistered(NsdServiceInfo: NsdServiceInfo) {
+            Log.i(TAG_MDNS, "Service registered! Name: ${NsdServiceInfo.serviceName}")
         }
 
         override fun onRegistrationFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
@@ -49,8 +50,8 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
         val serviceInfo = NsdServiceInfo().apply {
             // The name is subject to change based on conflicts
             // with other services advertised on the same network.
-            serviceName = "pizza-sms-gate"
-            serviceType = "_pizza._tcp"
+            serviceName = "pizza-sms-app"
+            serviceType = "_pizza-app._tcp"
             port = PORT
         }
 
@@ -95,14 +96,17 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
                 val pref =
                         PreferenceManager.getDefaultSharedPreferences(applicationContext)
                 val str = files[files.keys.first()]
+                Log.i(TAG, "File received from http: $str")
                 try {
                     val json: JSONObject = JSONObject(str)
                     val main = json.getBoolean("main")
                     val left = json.getBoolean("left")
                     val right = json.getBoolean("right")
                     val voltage = json.getDouble("voltage")
+                    val softVerDevice = json.getString("button-software-version-device")
                     pref.edit()
                             .putFloat("button_voltage", voltage.toFloat())
+                            .putString("button_software_version_device", softVerDevice)
                             .apply()
                     PizzaSenderService
                             .startActionBuildAndSendMessage(applicationContext, main, left, right)
@@ -116,9 +120,12 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
                     pref.getString("edit_text_preference_button_ssid", ""))
             json.put("password",
                     pref.getString("edit_text_preference_button_password", ""))
+            json.put("button-software-version-app", "0.7")
 
-            val res: NanoHTTPD.Response = NanoHTTPD.Response(json.toString())
+            val jsonStr = json.toString()
+            val res: NanoHTTPD.Response = NanoHTTPD.Response(jsonStr)
             res.mimeType = "text/json"
+            Log.i(TAG, "Http response: $jsonStr")
             return res
         }
     }
