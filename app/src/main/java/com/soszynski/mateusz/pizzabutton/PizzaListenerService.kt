@@ -120,7 +120,7 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
                     pref.getString("edit_text_preference_button_ssid", ""))
             json.put("password",
                     pref.getString("edit_text_preference_button_password", ""))
-            json.put("button-software-version-app", "0.7")
+            json.put("button-software-version-app", "1.0")
 
             val jsonStr = json.toString()
             val res: NanoHTTPD.Response = NanoHTTPD.Response(jsonStr)
