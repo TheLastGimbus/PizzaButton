@@ -3,7 +3,6 @@ package com.soszynski.mateusz.pizzabutton
 import android.Manifest
 import android.app.AlertDialog
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -52,11 +51,10 @@ class MainActivity : AppCompatActivity() {
 
     fun updateBattery() {
         val pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        val voltage = pref.getFloat("button_voltage", 4.2F).times(100).roundToLong()
         val percent =
                 map(
-                        pref.getFloat("button_voltage", 4.2F)
-                                .times(100)
-                                .roundToLong(),
+                        voltage,
                         300,
                         420,
                         0,
@@ -79,13 +77,11 @@ class MainActivity : AppCompatActivity() {
 
         updateBattery()
         val pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        val listener = SharedPreferences
-                .OnSharedPreferenceChangeListener { sharedPreferences, key ->
-                    if (key == "button_voltage") {
-                        updateBattery()
-                    }
-                }
-        pref.registerOnSharedPreferenceChangeListener(listener)
+        pref.registerOnSharedPreferenceChangeListener { sharedPreferences, key ->
+            if (key == "button_voltage") {
+                updateBattery()
+            }
+        }
 
 
         button_permission_box.setOnClickListener {
