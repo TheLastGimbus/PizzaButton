@@ -103,10 +103,8 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
                     val left = json.getBoolean("left")
                     val right = json.getBoolean("right")
                     val voltage = json.getDouble("voltage")
-                    val softVerDevice = json.getString("button-software-version-device")
                     pref.edit()
                             .putFloat("button_voltage", voltage.toFloat())
-                            .putString("button_software_version_device", softVerDevice)
                             .apply()
                     PizzaSenderService
                             .startActionBuildAndSendMessage(applicationContext, main, left, right)
