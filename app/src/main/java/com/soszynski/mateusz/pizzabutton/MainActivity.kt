@@ -2,8 +2,12 @@ package com.soszynski.mateusz.pizzabutton
 
 import android.Manifest
 import android.app.AlertDialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v4.app.ActivityCompat
@@ -21,7 +25,7 @@ class MainActivity : AppCompatActivity() {
                 PackageManager.PERMISSION_GRANTED
     }
 
-    fun askForPermission() {
+    private fun askForPermission() {
         val builder = AlertDialog.Builder(this)
         builder.setMessage(getString(R.string.sms_privilege_needed))
         builder.setNeutralButton("OK") { _, _ ->
@@ -33,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         builder.show()
     }
 
-    fun updateSmsPermissionBox() {
+    private fun updateSmsPermissionBox() {
         if (canSms()) {
             button_permission_box.setBackgroundResource(R.drawable.rounded_button_green)
             button_permission_box.text = getString(R.string.sms_permission_good_box)
@@ -49,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
     }
 
-    fun updateBattery() {
+    private fun updateBattery() {
         val pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         val voltage = pref.getFloat("button_voltage", 4.2F).times(100).roundToLong()
         val percent =
@@ -97,17 +101,6 @@ class MainActivity : AppCompatActivity() {
         // safer than normal click
         button_order.setOnLongClickListener {
             PizzaSenderService.startActionBuildAndSendMessage(this, true, false, false)
-            if (canSms()) {
-                Toast.makeText(
-                        this,
-                        getString(R.string.message_sent),
-                        Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(
-                        this,
-                        getString(R.string.sms_permission_bad_box),
-                        Toast.LENGTH_SHORT).show()
-            }
             return@setOnLongClickListener true
         }
 
@@ -115,6 +108,19 @@ class MainActivity : AppCompatActivity() {
         button_settings.setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
+        }
+
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val SEND_RESULT_CHANNEL_ID = "SEND_RESULT"
+            val sendResultChannel = NotificationChannel(
+                    SEND_RESULT_CHANNEL_ID,
+                    getString(R.string.notification_channel_send_result),
+                    NotificationManager.IMPORTANCE_HIGH)
+            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.createNotificationChannel(sendResultChannel)
+
         }
 
     }

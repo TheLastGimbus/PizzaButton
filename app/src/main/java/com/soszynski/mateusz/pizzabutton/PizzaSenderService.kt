@@ -43,7 +43,7 @@ class PizzaSenderService : IntentService("PizzaSenderService") {
     private fun handleActionSendMessage(number: String, message: String) {
         if (canSms()) {
             if (!PhoneNumberUtils.isGlobalPhoneNumber(number)) {
-                SmallNotification.notify(this, getString(R.string.message_not_sent_notification_title))
+                SmallNotification.notify(this, getString(R.string.message_not_sent_notification_title), getString(R.string.message_not_sent_wrong_number))
                 Log.i(TAG, "Sms not send because number is wrong!")
                 return
             }
@@ -56,15 +56,10 @@ class PizzaSenderService : IntentService("PizzaSenderService") {
                     null)
             Log.i(TAG, "Sms was sent, number: $number , message: $message")
 
-            if (PreferenceManager
-                            .getDefaultSharedPreferences(applicationContext)
-                            .getBoolean("notification_on_send", true)
-            ) {
-                SmallNotification.notify(this, getString(R.string.message_sent_notification_title))
-            }
+            SmallNotification.notify(this, getString(R.string.message_sent_notification_title))
 
         } else {
-            SmallNotification.notify(this, getString(R.string.message_not_sent_notification_title))
+            SmallNotification.notify(this, getString(R.string.message_not_sent_notification_title), getString(R.string.sms_permission_bad_box))
         }
     }
 

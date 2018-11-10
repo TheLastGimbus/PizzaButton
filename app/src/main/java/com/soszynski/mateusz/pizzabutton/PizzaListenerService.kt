@@ -45,7 +45,7 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
         }
     }
 
-    fun startService() {
+    private fun startService() {
         // Create the NsdServiceInfo object, and populate it.
         val serviceInfo = NsdServiceInfo().apply {
             // The name is subject to change based on conflicts
@@ -60,7 +60,7 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
         }
     }
 
-    fun endService() {
+    private fun endService() {
         val mNsdManager = (getSystemService(Context.NSD_SERVICE) as NsdManager).apply {
             unregisterService(mRegistrationListener)
         }

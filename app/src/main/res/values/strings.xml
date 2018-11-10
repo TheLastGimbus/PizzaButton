@@ -37,4 +37,6 @@
 
     <string name="message_sent_notification_title">Message was sent</string>
     <string name="message_not_sent_notification_title">Message WASN\'T sent!</string>
+    <string name="message_not_sent_wrong_number">Your selected number is incorrect!</string>
+    <string name="notification_channel_send_result">Message send result</string>
 </resources>

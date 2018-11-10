@@ -37,4 +37,6 @@
 
     <string name="message_sent_notification_title">Wiadomość została wysłana</string>
     <string name="message_not_sent_notification_title">Wiadomość NIE została wysłana!</string>
+    <string name="message_not_sent_wrong_number">Wybrany numer nie jest prawidłowy!</string>
+    <string name="notification_channel_send_result">Status wysłania wiadomości</string>
 </resources>
