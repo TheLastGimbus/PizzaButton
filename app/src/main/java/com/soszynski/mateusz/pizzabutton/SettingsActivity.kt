@@ -1,10 +1,8 @@
 package com.soszynski.mateusz.pizzabutton
 
-import android.annotation.TargetApi
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
 import android.preference.*
 import android.support.v4.app.NavUtils
@@ -36,7 +34,6 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         return isXLargeTablet(this)
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     override fun onBuildHeaders(target: List<PreferenceActivity.Header>) {
         loadHeadersFromResource(R.xml.pref_headers, target)
     }
@@ -47,11 +44,6 @@ class SettingsActivity : AppCompatPreferenceActivity() {
                 || ButtonConfigPreferenceFragment::class.java.name == fragmentName
     }
 
-    /**
-     * This fragment shows general preferences only. It is used when the
-     * activity is showing a two-pane settings UI.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     class GeneralPreferenceFragment : PreferenceFragment() {
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
@@ -76,7 +68,6 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     class ButtonConfigPreferenceFragment : PreferenceFragment() {
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
@@ -102,11 +93,6 @@ class SettingsActivity : AppCompatPreferenceActivity() {
     }
 
     companion object {
-
-        /**
-         * A preference value change listener that updates the preference's summary
-         * to reflect its new value.
-         */
         private val sBindPreferenceSummaryToValueListener =
                 Preference.OnPreferenceChangeListener { preference, value ->
                     val stringValue = value.toString()
@@ -132,24 +118,12 @@ class SettingsActivity : AppCompatPreferenceActivity() {
                     true
                 }
 
-        /**
-         * Helper method to determine if the device has an extra-large screen. For
-         * example, 10" tablets are extra-large.
-         */
+
         private fun isXLargeTablet(context: Context): Boolean {
             return context.resources.configuration.screenLayout and
                     Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_XLARGE
         }
 
-        /**
-         * Binds a preference's summary to its value. More specifically, when the
-         * preference's value is changed, its summary (line of text below the
-         * preference title) is updated to reflect the value. The summary is also
-         * immediately updated upon calling this method. The exact display format is
-         * dependent on the type of preference.
-
-         * @see .sBindPreferenceSummaryToValueListener
-         */
         private fun bindPreferenceSummaryToValue(preference: Preference) {
             // Set the listener to watch for value changes.
             preference.onPreferenceChangeListener = sBindPreferenceSummaryToValueListener

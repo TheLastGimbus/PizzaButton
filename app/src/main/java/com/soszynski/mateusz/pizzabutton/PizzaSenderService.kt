@@ -2,6 +2,7 @@ package com.soszynski.mateusz.pizzabutton
 
 import android.Manifest
 import android.app.IntentService
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -14,6 +15,7 @@ import android.util.Log
 
 class PizzaSenderService : IntentService("PizzaSenderService") {
     private val TAG = "PizzaSenderService"
+    private val SENT = "SMS_SENT"
 
     override fun onHandleIntent(intent: Intent?) {
         when (intent?.action) {
@@ -25,10 +27,10 @@ class PizzaSenderService : IntentService("PizzaSenderService") {
             ACTION_BUILD_AND_SEND_MESSAGE -> {
                 if (intent.getBooleanExtra(MAIN_BUTTON, false)) {
                     val pref = PreferenceManager.getDefaultSharedPreferences(this)
-                    val number: String = pref.getString("edit_text_preference_number", "0")
+                    val number: String = pref.getString("edit_text_preference_number", "[num]")
                     val message: String =
                             pref.getString("edit_text_preference_message",
-                                    getString(R.string.pref_default_message))
+                                    getString(R.string.pref_placeholder_default_message))
                     handleActionSendMessage(number, message)
                 }
             }
@@ -41,26 +43,30 @@ class PizzaSenderService : IntentService("PizzaSenderService") {
     }
 
     private fun handleActionSendMessage(number: String, message: String) {
-        if (canSms()) {
-            if (!PhoneNumberUtils.isGlobalPhoneNumber(number)) {
-                SmallNotification.notify(this, getString(R.string.message_not_sent_notification_title), getString(R.string.message_not_sent_wrong_number))
-                Log.i(TAG, "Sms not send because number is wrong!")
-                return
-            }
-
-            SmsManager.getDefault().sendTextMessage(
-                    number,
-                    null,
-                    message,
-                    null,
-                    null)
-            Log.i(TAG, "Sms was sent, number: $number , message: $message")
-
-            SmallNotification.notify(this, getString(R.string.message_sent_notification_title))
-
-        } else {
-            SmallNotification.notify(this, getString(R.string.message_not_sent_notification_title), getString(R.string.sms_permission_bad_box))
+        if (!canSms()) {
+            Notifications().notifySendFailNoPermission(this)
+            return
         }
+        if (!PhoneNumberUtils.isGlobalPhoneNumber(number)) {
+            Notifications().notifySendFailWrongNumber(this)
+            Log.i(TAG, "Sms not send because number is wrong!")
+            return
+        }
+
+        val sentPI = PendingIntent.getBroadcast(
+                this,
+                0,
+                Intent(this, SmsStatusReceiver().javaClass),
+                0)
+
+        SmsManager.getDefault().sendTextMessage(
+                number,
+                null,
+                message,
+                sentPI,
+                null)
+
+        Log.i(TAG, "Sms passed to smsManager, number: $number , message: $message")
     }
 
 
@@ -75,7 +81,9 @@ class PizzaSenderService : IntentService("PizzaSenderService") {
         const val RIGHT_BUTTON = "right_button"
 
         @JvmStatic
-        fun startActionBuildAndSendMessage(context: Context, main: Boolean, left: Boolean, right: Boolean) {
+        fun startActionBuildAndSendMessage(
+                context: Context, main: Boolean = true, left: Boolean = true, right: Boolean = true) {
+
             val intent = Intent(context, PizzaSenderService::class.java).apply {
                 action = ACTION_BUILD_AND_SEND_MESSAGE
                 putExtra(MAIN_BUTTON, main)

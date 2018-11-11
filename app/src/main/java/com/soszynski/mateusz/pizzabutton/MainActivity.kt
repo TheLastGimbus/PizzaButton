@@ -15,7 +15,6 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlin.math.roundToLong
 
 
 class MainActivity : AppCompatActivity() {
@@ -25,47 +24,49 @@ class MainActivity : AppCompatActivity() {
                 PackageManager.PERMISSION_GRANTED
     }
 
-    private fun askForPermission() {
+    private fun askForPermission(code: Int = 1) {
         val builder = AlertDialog.Builder(this)
-        builder.setMessage(getString(R.string.sms_privilege_needed))
+        builder.setMessage(getString(R.string.dialog_sms_privilege_needed))
         builder.setNeutralButton("OK") { _, _ ->
             ActivityCompat.requestPermissions(this,
                     arrayOf(Manifest.permission.SEND_SMS),
-                    1)
+                    code)
         }
         builder.create()
         builder.show()
     }
 
-    private fun updateSmsPermissionBox() {
-        if (canSms()) {
-            button_permission_box.setBackgroundResource(R.drawable.rounded_button_green)
-            button_permission_box.text = getString(R.string.sms_permission_good_box)
-        } else {
-            button_permission_box.setBackgroundResource(R.drawable.rounded_button_red)
-            button_permission_box.text = getString(R.string.sms_permission_bad_box)
+    override fun onRequestPermissionsResult(
+            requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            1 -> {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, getString(R.string.thank_you), Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, getString(R.string.toast_sms_denied), Toast.LENGTH_SHORT).show()
+                }
+                updateSmsPermissionBox()
+            }
         }
     }
 
-    // yup, my own map function from arduino because i was to lazy to search deeper for
-    // builtin equivalent in kotlin
-    fun map(x: Long, in_min: Long, in_max: Long, out_min: Long, out_max: Long): Long {
-        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+    private fun updateSmsPermissionBox() {
+        if (canSms()) {
+            button_permission_box.setBackgroundResource(R.drawable.rounded_button_green)
+            button_permission_box.text = getString(R.string.view_sms_permission_good_box)
+        } else {
+            button_permission_box.setBackgroundResource(R.drawable.rounded_button_red)
+            button_permission_box.text = getString(R.string.view_sms_permission_bad_box)
+        }
     }
 
     private fun updateBattery() {
         val pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        val voltage = pref.getFloat("button_voltage", 4.2F).times(100).roundToLong()
-        val percent =
-                map(
-                        voltage,
-                        300,
-                        420,
-                        0,
-                        100
-                )
-        textViewBattery.text = "${getString(R.string.button_battery)}: $percent%"
-        progressBarBattery.progress = percent.toInt()
+        val voltage = pref.getFloat("button_voltage", 4.2F)
+        val percent = MathHelp().voltageToPercentage(voltage.toDouble())
+        textViewBattery.text = "${getString(R.string.view_button_battery)}: $percent%"
+        progressBarBattery.progress = percent
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,17 +75,22 @@ class MainActivity : AppCompatActivity() {
 
         startService(Intent(this, PizzaListenerService::class.java))
 
+
         updateSmsPermissionBox()
         if (!canSms()) {
             askForPermission()
         }
 
         updateBattery()
-        val pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        val pref = PreferenceManager.getDefaultSharedPreferences(this)
         pref.registerOnSharedPreferenceChangeListener { sharedPreferences, key ->
             if (key == "button_voltage") {
                 updateBattery()
             }
+        }
+        linearLayoutBattery.setOnClickListener {
+            // this is stupid af
+            updateBattery()
         }
 
 
@@ -93,7 +99,7 @@ class MainActivity : AppCompatActivity() {
                 askForPermission()
             } else {
                 Toast.makeText(this,
-                        getString(R.string.sms_permission_good_box),
+                        getString(R.string.view_sms_permission_good_box),
                         Toast.LENGTH_SHORT).show()
             }
         }
@@ -123,19 +129,6 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>, grantResults: IntArray) {
-        if (requestCode == 1) {
-            // If request is cancelled, the result arrays are empty.
-            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                Toast.makeText(this, getString(R.string.thank_you), Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, getString(R.string.sms_denied), Toast.LENGTH_SHORT).show()
-            }
-            updateSmsPermissionBox()
-        }
     }
 
 }

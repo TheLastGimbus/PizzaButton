@@ -10,6 +10,6 @@
     <header
         android:fragment="com.soszynski.mateusz.pizzabutton.SettingsActivity$ButtonConfigPreferenceFragment"
         android:icon="@drawable/ic_settings_black_24dp"
-        android:title="@string/pref_header_button_config" />
+        android:title="@string/pref_header_button_configuration" />
 
 </preference-headers>

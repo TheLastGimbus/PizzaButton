@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -34,6 +33,7 @@
             android:layout_margin="8dp"
             android:layout_weight="0"
             android:background="@drawable/rounded_button"
+            android:elevation="2dp"
             android:orientation="vertical">
 
             <TextView
@@ -43,7 +43,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginRight="8dp"
-                android:text="@string/button_battery"
+                android:text="@string/view_button_battery"
                 android:textColor="@android:color/black"
                 android:textSize="18sp" />
 
@@ -66,7 +66,7 @@
             android:layout_margin="8dp"
             android:layout_weight="10"
             android:background="@drawable/rounded_button"
-            android:text="@string/order_default" />
+            android:text="@string/view_order_default" />
 
         <Button
             android:id="@+id/button_settings"
@@ -75,7 +75,7 @@
             android:layout_margin="8dp"
             android:layout_weight="5"
             android:background="@drawable/rounded_button"
-            android:text="@string/settings" />
+            android:text="@string/view_settings" />
 
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

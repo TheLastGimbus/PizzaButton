@@ -87,6 +87,9 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
 
 
     private inner class WebServer : NanoHTTPD(PORT) {
+        fun map(x: Long, in_min: Long, in_max: Long, out_min: Long, out_max: Long): Long {
+            return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+        }
 
         override fun serve(uri: String?, method: NanoHTTPD.Method?,
                            header: Map<String, String>?,
@@ -97,21 +100,35 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
                         PreferenceManager.getDefaultSharedPreferences(applicationContext)
                 val str = files[files.keys.first()]
                 Log.i(TAG, "File received from http: $str")
+
+                var json = JSONObject(str)
+                var main: Boolean = false
+                var left: Boolean = false
+                var right: Boolean = false
+                var voltage: Double = 4.2
                 try {
-                    val json: JSONObject = JSONObject(str)
-                    val main = json.getBoolean("main")
-                    val left = json.getBoolean("left")
-                    val right = json.getBoolean("right")
-                    val voltage = json.getDouble("voltage")
+                    json = JSONObject(str)
+                    main = json.getBoolean("main")
+                    left = json.getBoolean("left")
+                    right = json.getBoolean("right")
+                    voltage = json.getDouble("voltage")
+
                     pref.edit()
                             .putFloat("button_voltage", voltage.toFloat())
                             .apply()
-                    PizzaSenderService
-                            .startActionBuildAndSendMessage(applicationContext, main, left, right)
                 } catch (e: JSONException) {
                     e.printStackTrace()
                 }
+                PizzaSenderService
+                        .startActionBuildAndSendMessage(applicationContext, main, left, right)
+
+                val percent = MathHelp().voltageToPercentage(voltage)
+                if (percent < 40) {
+                    Notifications().notifyLowBattery(this@PizzaListenerService, percent)
+                }
             }
+
+
             var json: JSONObject = JSONObject()
             val pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
             json.put("ssid",
