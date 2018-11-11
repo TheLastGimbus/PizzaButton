@@ -36,4 +36,5 @@
     <string name="notification_text_message_sent_fail_sms_manager_fail">Brak zasięgu, lub jest inny problem powiązany z operatorem!</string>
     <string name="notification_title_low_battery">Poziom naładowania jest niski!</string>
     <string name="notification_text_low_battery">Bateria ma [percent]%</string>
+    <string name="widget_battery_widget_name">Bateria</string>
 </resources>

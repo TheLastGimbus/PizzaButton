@@ -36,4 +36,5 @@
     <string name="notification_text_message_sent_fail_sms_manager_fail">There is no phone network, or there is other network-related issue!</string>
     <string name="notification_title_low_battery">Button\'s battery is low!</string>
     <string name="notification_text_low_battery">Battery has [percent]%</string>
+    <string name="widget_battery_widget_name">Battery</string>
 </resources>

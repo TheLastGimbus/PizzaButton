@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.soszynski.mateusz.pizzabutton">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.soszynski.mateusz.pizzabutton"
+    tools:ignore="GoogleAppIndexingWarning">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -36,7 +38,6 @@
         <service
             android:name=".PizzaListenerService"
             android:exported="false" />
-
         <service
             android:name=".PizzaSenderService"
             android:exported="false" />
@@ -44,8 +45,7 @@
         <receiver
             android:name=".SmsStatusReceiver"
             android:enabled="true"
-            android:exported="true"></receiver>
-
+            android:exported="true" />
         <receiver
             android:name=".BootUpReceiver"
             android:enabled="true"
@@ -57,6 +57,18 @@
             </intent-filter>
         </receiver>
 
+
+        <receiver
+            android:name=".BatteryWidget"
+            android:label="@string/widget_battery_widget_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/battery_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

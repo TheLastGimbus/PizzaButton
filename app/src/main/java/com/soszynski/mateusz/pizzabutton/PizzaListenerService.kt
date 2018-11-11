@@ -1,7 +1,9 @@
 package com.soszynski.mateusz.pizzabutton
 
 import android.app.IntentService
+import android.app.PendingIntent
 import android.app.Service
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.net.nsd.NsdManager
@@ -101,13 +103,12 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
                 val str = files[files.keys.first()]
                 Log.i(TAG, "File received from http: $str")
 
-                var json = JSONObject(str)
                 var main: Boolean = false
                 var left: Boolean = false
                 var right: Boolean = false
                 var voltage: Double = 4.2
                 try {
-                    json = JSONObject(str)
+                    val json = JSONObject(str)
                     main = json.getBoolean("main")
                     left = json.getBoolean("left")
                     right = json.getBoolean("right")
@@ -116,9 +117,11 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
                     pref.edit()
                             .putFloat("button_voltage", voltage.toFloat())
                             .apply()
+
                 } catch (e: JSONException) {
                     e.printStackTrace()
                 }
+
                 PizzaSenderService
                         .startActionBuildAndSendMessage(applicationContext, main, left, right)
 
@@ -126,10 +129,19 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
                 if (percent < 40) {
                     Notifications().notifyLowBattery(this@PizzaListenerService, percent)
                 }
+
+                val updateWidget = Intent(this@PizzaListenerService, BatteryWidget::class.java)
+                updateWidget.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                val pendingIntent = PendingIntent.getBroadcast(
+                        this@PizzaListenerService,
+                        0,
+                        updateWidget,
+                        0)
+                pendingIntent.send()
             }
 
 
-            var json: JSONObject = JSONObject()
+            val json = JSONObject()
             val pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
             json.put("ssid",
                     pref.getString("edit_text_preference_button_ssid", ""))
