@@ -1,5 +1,6 @@
 package com.soszynski.mateusz.pizzabutton
 
+import android.app.AlarmManager
 import android.app.IntentService
 import android.app.PendingIntent
 import android.app.Service
@@ -8,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
+import android.os.SystemClock
 import android.preference.PreferenceManager
 import android.util.Log
 import fi.iki.elonen.NanoHTTPD
@@ -40,6 +42,7 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
         }
 
         override fun onServiceUnregistered(arg0: NsdServiceInfo) {
+            Log.e(TAG_MDNS, "Service unregistered!")
         }
 
         override fun onUnregistrationFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
@@ -71,6 +74,19 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
 
     override fun onCreate() {
         super.onCreate()
+
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val servicePI = PendingIntent.getService(
+                this,
+                0,
+                Intent(this, PizzaListenerService::class.java),
+                0)
+        alarmManager.setRepeating(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime(),
+                2 * 60 * 1000, // 2 min
+                servicePI)
+
         startService()
 
         server = WebServer()
@@ -89,9 +105,6 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
 
 
     private inner class WebServer : NanoHTTPD(PORT) {
-        fun map(x: Long, in_min: Long, in_max: Long, out_min: Long, out_max: Long): Long {
-            return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
-        }
 
         override fun serve(uri: String?, method: NanoHTTPD.Method?,
                            header: Map<String, String>?,

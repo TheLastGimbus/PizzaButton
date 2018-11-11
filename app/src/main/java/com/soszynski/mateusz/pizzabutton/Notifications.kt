@@ -9,13 +9,15 @@ import android.support.v4.app.NotificationManagerCompat
 
 class Notifications {
 
+    val SEND_RESULT_CHANNEL_ID = "SEND_RESULT"
+
     fun notifySendSuccess(context: Context) {
         val notifyPendingIntent = PendingIntent.getActivity(
                 context, 0, Intent(context, MainActivity::class.java), 0)
         val builder = NotificationCompat.Builder(context)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setSmallIcon(R.drawable.ic_local_pizza_black_24dp)
-                .setChannelId("SEND_RESULT")
+                .setChannelId(SEND_RESULT_CHANNEL_ID)
                 .setContentTitle(context.getString(R.string.notification_title_message_sent_success))
                 .setContentIntent(notifyPendingIntent)
                 .setAutoCancel(true)
@@ -27,7 +29,7 @@ class Notifications {
         val builder = NotificationCompat.Builder(context)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setSmallIcon(R.drawable.ic_warning_black_24dp)
-                .setChannelId("SEND_RESULT")
+                .setChannelId(SEND_RESULT_CHANNEL_ID)
                 .setContentTitle(context.getString(R.string.notification_title_message_sent_fail))
 
         notify(context, builder.build())
@@ -40,7 +42,7 @@ class Notifications {
         val builder = NotificationCompat.Builder(context)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setSmallIcon(R.drawable.ic_warning_black_24dp)
-                .setChannelId("SEND_RESULT")
+                .setChannelId(SEND_RESULT_CHANNEL_ID)
                 .setContentTitle(context.getString(R.string.notification_title_message_sent_fail))
                 .setStyle(NotificationCompat.BigTextStyle().bigText(text))
                 .setContentText(text)
@@ -56,7 +58,7 @@ class Notifications {
         val builder = NotificationCompat.Builder(context)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setSmallIcon(R.drawable.ic_warning_black_24dp)
-                .setChannelId("SEND_RESULT")
+                .setChannelId(SEND_RESULT_CHANNEL_ID)
                 .setContentTitle(context.getString(R.string.notification_title_message_sent_fail))
                 .setStyle(NotificationCompat.BigTextStyle().bigText(text))
                 .setContentText(text)
@@ -73,7 +75,7 @@ class Notifications {
         val builder = NotificationCompat.Builder(context)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setSmallIcon(R.drawable.ic_warning_black_24dp)
-                .setChannelId("SEND_RESULT")
+                .setChannelId(SEND_RESULT_CHANNEL_ID)
                 .setContentTitle(context.getString(R.string.notification_title_message_sent_fail))
                 .setStyle(NotificationCompat.BigTextStyle().bigText(text))
                 .setContentText(text)
@@ -89,7 +91,7 @@ class Notifications {
         val builder = NotificationCompat.Builder(context)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setSmallIcon(R.drawable.ic_warning_black_24dp)
-                .setChannelId("SEND_RESULT")
+                .setChannelId(SEND_RESULT_CHANNEL_ID)
                 .setContentTitle(context.getString(R.string.notification_title_low_battery))
                 .setContentText(text)
 
