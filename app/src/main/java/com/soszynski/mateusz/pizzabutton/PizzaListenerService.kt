@@ -9,8 +9,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
+import android.os.Build
 import android.os.SystemClock
 import android.preference.PreferenceManager
+import android.support.annotation.RequiresApi
 import android.util.Log
 import fi.iki.elonen.NanoHTTPD
 import org.json.JSONException
@@ -19,15 +21,90 @@ import org.json.JSONObject
 
 class PizzaListenerService : IntentService("PizzaListenerService") {
     private val TAG = "PizzaListenerService"
-    private val TAG_MDNS = "MDNS"
-    private val PORT = 8182
-    private var server: WebServer? = null
+    private val TAG_MDNS = "PizzaListener_mDNS"
+    val ACTION_ALARM_LOOP = "action_alarm_loop"
 
-    override fun onHandleIntent(intent: Intent?) {}
+    private val PORT = 8182
+    private var server: WebServer = WebServer()
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun setIdleAlarm() {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val serviceIntent = Intent(this, PizzaListenerService::class.java)
+        serviceIntent.action = ACTION_ALARM_LOOP
+        val servicePI = PendingIntent.getService(
+                this,
+                0,
+                serviceIntent,
+                0)
+
+        alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + (2 * 60 * 1000), // 2 min
+                servicePI)
+    }
+
+    override fun onHandleIntent(intent: Intent?) {
+        Log.i(TAG, "onHandleIntent action: ${intent?.action}")
+        if (intent?.action == ACTION_ALARM_LOOP && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            setIdleAlarm()
+            Log.i(TAG, "Idle alarm was received and set again")
+        }
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        onHandleIntent(intent)
+        Log.d(TAG, "Server running: ${server.isAlive}")
+        if (!server.isAlive) {
+            server.closeAllConnections()
+            server.stop()
+            server.start()
+        }
         return Service.START_STICKY
     }
+
+    override fun onCreate() {
+        super.onCreate()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            setIdleAlarm()
+            Log.i(TAG, "Idle alarm was set (onCreate)")
+        }
+
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val servicePI = PendingIntent.getService(
+                this,
+                0,
+                Intent(this, PizzaListenerService::class.java),
+                0)
+
+        alarmManager.setRepeating(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime(),
+                2 * 60 * 1000, // 2 min
+                servicePI)
+
+
+        startService()
+
+        server.start()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        endService()
+
+        server.closeAllConnections()
+        server.stop()
+        Log.i(TAG, "onDestroy performed")
+    }
+
+    override fun onUnbind(intent: Intent?): Boolean {
+        // for now, i don't know what the hell it does, but i've heard that it i will help so...
+        return true
+    }
+
 
     // mDNS stuff
 
@@ -72,38 +149,6 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
     }
 
 
-    override fun onCreate() {
-        super.onCreate()
-
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val servicePI = PendingIntent.getService(
-                this,
-                0,
-                Intent(this, PizzaListenerService::class.java),
-                0)
-        alarmManager.setRepeating(
-                AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime(),
-                2 * 60 * 1000, // 2 min
-                servicePI)
-
-        startService()
-
-        server = WebServer()
-        server!!.start()
-        Log.i(TAG, "Server started")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        endService()
-
-        server?.closeAllConnections()
-        server?.stop()
-        Log.i(TAG, "Server stopped due to onDestroy method")
-    }
-
-
     private inner class WebServer : NanoHTTPD(PORT) {
 
         override fun serve(uri: String?, method: NanoHTTPD.Method?,
@@ -139,7 +184,7 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
                         .startActionBuildAndSendMessage(applicationContext, main, left, right)
 
                 val percent = MathHelp().voltageToPercentage(voltage)
-                if (percent < 40) {
+                if (percent < 60) {
                     Notifications().notifyLowBattery(this@PizzaListenerService, percent)
                 }
 
@@ -152,7 +197,6 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
                         0)
                 pendingIntent.send()
             }
-
 
             val json = JSONObject()
             val pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
@@ -167,6 +211,16 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
             res.mimeType = "text/json"
             Log.i(TAG, "Http response: $jsonStr")
             return res
+        }
+
+        override fun start() {
+            super.start()
+            Log.i(TAG, "Server started")
+        }
+
+        override fun stop() {
+            super.stop()
+            Log.i(TAG, "Server stopped")
         }
     }
 }
