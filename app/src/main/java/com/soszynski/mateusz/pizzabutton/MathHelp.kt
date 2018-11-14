@@ -10,9 +10,10 @@ class MathHelp {
     }
 
     fun voltageToPercentage(voltage: Double): Int {
+        val voltage = voltage.coerceIn(3.3, 4.2)
         return map(
                 voltage,
-                3.0,
+                3.3,
                 4.2,
                 0.0,
                 100.0
