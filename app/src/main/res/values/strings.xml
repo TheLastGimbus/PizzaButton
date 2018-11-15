@@ -37,4 +37,7 @@
     <string name="notification_title_low_battery">Button\'s battery is low!</string>
     <string name="notification_text_low_battery">Battery has [percent]%</string>
     <string name="widget_battery_widget_name">Battery</string>
+    <string name="pref_title_run_in_foreground">Display a notification</string>
+    <string name="pref_description_run_in_foreground">It can help if your phone is low on RAM</string>
+    <string name="notification_title_foreground_running">App is running</string>
 </resources>

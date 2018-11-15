@@ -7,6 +7,7 @@ import android.app.Service
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.os.Build
@@ -19,7 +20,10 @@ import org.json.JSONException
 import org.json.JSONObject
 
 
-class PizzaListenerService : IntentService("PizzaListenerService") {
+class PizzaListenerService : IntentService("PizzaListenerService"),
+        SharedPreferences.OnSharedPreferenceChangeListener {
+
+
     private val TAG = "PizzaListenerService"
     private val TAG_MDNS = "PizzaListener_mDNS"
     val ACTION_ALARM_LOOP = "action_alarm_loop"
@@ -54,6 +58,7 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         onHandleIntent(intent)
+
         Log.d(TAG, "Server running: ${server.isAlive}")
         if (!server.isAlive) {
             server.closeAllConnections()
@@ -84,6 +89,9 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
                 2 * 60 * 1000, // 2 min
                 servicePI)
 
+        foregroundHandle()
+        val pref = PreferenceManager.getDefaultSharedPreferences(this)
+        pref.registerOnSharedPreferenceChangeListener(this)
 
         startService()
 
@@ -106,12 +114,31 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
     }
 
 
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (key == "switch_preference_run_in_foreground") {
+            foregroundHandle()
+        }
+    }
+
+    private fun foregroundHandle() {
+        val pref = PreferenceManager.getDefaultSharedPreferences(this)
+        val foreground = pref.getBoolean("switch_preference_run_in_foreground", false)
+        if (foreground) {
+            startForeground(15, Notifications().getForegroundNotification(this))
+        } else {
+            stopForeground(true)
+        }
+        Log.i(TAG, "Running in foreground: $foreground")
+    }
+
+
     // mDNS stuff
 
     private val mRegistrationListener = object : NsdManager.RegistrationListener {
 
         override fun onServiceRegistered(NsdServiceInfo: NsdServiceInfo) {
-            Log.i(TAG_MDNS, "Service registered! Name: ${NsdServiceInfo.serviceName}")
+            Log.i(TAG_MDNS, "Service registered! \n" +
+                    "Service name: ${NsdServiceInfo.serviceName} \n")
         }
 
         override fun onRegistrationFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
@@ -119,7 +146,7 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
         }
 
         override fun onServiceUnregistered(arg0: NsdServiceInfo) {
-            Log.e(TAG_MDNS, "Service unregistered!")
+            Log.i(TAG_MDNS, "Service unregistered!")
         }
 
         override fun onUnregistrationFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
@@ -155,9 +182,9 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
                            header: Map<String, String>?,
                            parameters: Map<String, String>?,
                            files: Map<String, String>?): NanoHTTPD.Response {
+            val pref =
+                    PreferenceManager.getDefaultSharedPreferences(this@PizzaListenerService)
             if (files!!.isNotEmpty()) {
-                val pref =
-                        PreferenceManager.getDefaultSharedPreferences(applicationContext)
                 val str = files[files.keys.first()]
                 Log.i(TAG, "File received from http: $str")
 
@@ -199,7 +226,6 @@ class PizzaListenerService : IntentService("PizzaListenerService") {
             }
 
             val json = JSONObject()
-            val pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
             json.put("ssid",
                     pref.getString("edit_text_preference_button_ssid", ""))
             json.put("password",

@@ -2,12 +2,8 @@ package com.soszynski.mateusz.pizzabutton
 
 import android.Manifest
 import android.app.AlertDialog
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v4.app.ActivityCompat
@@ -117,18 +113,7 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val SEND_RESULT_CHANNEL_ID = "SEND_RESULT"
-            val sendResultChannel = NotificationChannel(
-                    SEND_RESULT_CHANNEL_ID,
-                    getString(R.string.notification_channel_send_result),
-                    NotificationManager.IMPORTANCE_HIGH)
-            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            manager.createNotificationChannel(sendResultChannel)
-
-        }
-
+        Notifications().createChannels(this)
     }
 
 }

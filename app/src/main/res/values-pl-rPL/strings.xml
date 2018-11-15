@@ -37,4 +37,7 @@
     <string name="notification_title_low_battery">Poziom naładowania jest niski!</string>
     <string name="notification_text_low_battery">Bateria ma [percent]%</string>
     <string name="widget_battery_widget_name">Bateria</string>
+    <string name="pref_title_run_in_foreground">Wyświetlaj powiadomienie</string>
+    <string name="pref_description_run_in_foreground">To może pomóc jeżeli twój telefon ma mało RAM\'u</string>
+    <string name="notification_title_foreground_running">Aplikacja działa w tle</string>
 </resources>

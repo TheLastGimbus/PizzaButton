@@ -13,5 +13,10 @@
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="@string/pref_title_message" />
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="switch_preference_run_in_foreground"
+        android:summary="@string/pref_description_run_in_foreground"
+        android:title="@string/pref_title_run_in_foreground" />
 
 </PreferenceScreen>
