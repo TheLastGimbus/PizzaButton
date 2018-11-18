@@ -40,4 +40,5 @@
     <string name="pref_title_run_in_foreground">Display a notification</string>
     <string name="pref_description_run_in_foreground">It can help if your phone is low on RAM</string>
     <string name="notification_title_foreground_running">App is running</string>
+    <string name="toast_sending">Sending...</string>
 </resources>
