@@ -31,21 +31,33 @@ class PizzaListenerService : IntentService("PizzaListenerService"),
     private val PORT = 8182
     private var server: WebServer = WebServer()
 
+
+    private fun getServicePI(idleAlarmLoop: Boolean = false): PendingIntent {
+        val pref = PreferenceManager.getDefaultSharedPreferences(this)
+        val intent = Intent(this, PizzaListenerService::class.java)
+        if (idleAlarmLoop) {
+            intent.action = ACTION_ALARM_LOOP
+        }
+
+        return if (
+                pref.getBoolean("switch_preference_run_in_foreground", true) &&
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+        ) {
+            PendingIntent.getForegroundService(this, 0, intent, 0)
+        } else {
+            PendingIntent.getService(this, 0, intent, 0)
+        }
+
+    }
+
     @RequiresApi(Build.VERSION_CODES.M)
     private fun setIdleAlarm() {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val serviceIntent = Intent(this, PizzaListenerService::class.java)
-        serviceIntent.action = ACTION_ALARM_LOOP
-        val servicePI = PendingIntent.getService(
-                this,
-                0,
-                serviceIntent,
-                0)
 
         alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.ELAPSED_REALTIME_WAKEUP,
                 SystemClock.elapsedRealtime() + (2 * 60 * 1000), // 2 min
-                servicePI)
+                getServicePI(true))
     }
 
     override fun onHandleIntent(intent: Intent?) {
@@ -74,20 +86,14 @@ class PizzaListenerService : IntentService("PizzaListenerService"),
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             setIdleAlarm()
             Log.i(TAG, "Idle alarm was set (onCreate)")
+        } else {
+            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.setRepeating(
+                    AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    SystemClock.elapsedRealtime(),
+                    2 * 60 * 1000, // 2 min
+                    getServicePI())
         }
-
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val servicePI = PendingIntent.getService(
-                this,
-                0,
-                Intent(this, PizzaListenerService::class.java),
-                0)
-
-        alarmManager.setRepeating(
-                AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime(),
-                2 * 60 * 1000, // 2 min
-                servicePI)
 
         foregroundHandle()
         val pref = PreferenceManager.getDefaultSharedPreferences(this)
@@ -122,9 +128,9 @@ class PizzaListenerService : IntentService("PizzaListenerService"),
 
     private fun foregroundHandle() {
         val pref = PreferenceManager.getDefaultSharedPreferences(this)
-        val foreground = pref.getBoolean("switch_preference_run_in_foreground", false)
+        val foreground = pref.getBoolean("switch_preference_run_in_foreground", true)
         if (foreground) {
-            startForeground(15, Notifications().getForegroundNotification(this))
+            startForeground(Notifications().ID_FOREGROUND, Notifications().getForegroundNotification(this))
         } else {
             stopForeground(true)
         }

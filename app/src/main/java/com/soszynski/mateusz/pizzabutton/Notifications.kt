@@ -16,6 +16,10 @@ class Notifications {
     val SEND_RESULT_CHANNEL_ID = "SEND_RESULT"
     val APP_RUNNING_CHANNEL_ID = "APP_RUNNING"
 
+    val ID_BATTERY = 10
+    val ID_STATUS = 0
+    val ID_FOREGROUND = 30
+
     fun notifySendSuccess(context: Context) {
         val notifyPendingIntent = PendingIntent.getActivity(
                 context, 0, Intent(context, MainActivity::class.java), 0)
@@ -100,7 +104,7 @@ class Notifications {
                 .setContentTitle(context.getString(R.string.notification_title_low_battery))
                 .setContentText(text)
 
-        notify(context, builder.build(), 10)
+        notify(context, builder.build(), ID_BATTERY)
     }
 
 

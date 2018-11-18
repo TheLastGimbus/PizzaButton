@@ -2,9 +2,13 @@ package com.soszynski.mateusz.pizzabutton
 
 import android.Manifest
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.preference.PreferenceManager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -69,7 +73,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        startService(Intent(this, PizzaListenerService::class.java))
+        val pref = PreferenceManager.getDefaultSharedPreferences(this)
+
+        if (
+                pref.getBoolean("switch_preference_run_in_foreground", true) &&
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+        ) {
+            startForegroundService(Intent(this, PizzaListenerService::class.java))
+        } else {
+            startService(Intent(this, PizzaListenerService::class.java))
+        }
 
 
         updateSmsPermissionBox()
@@ -78,7 +91,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         updateBattery()
-        val pref = PreferenceManager.getDefaultSharedPreferences(this)
         pref.registerOnSharedPreferenceChangeListener { sharedPreferences, key ->
             if (key == "button_voltage") {
                 updateBattery()
@@ -103,7 +115,18 @@ class MainActivity : AppCompatActivity() {
         // safer than normal click
         button_order.setOnLongClickListener {
             PizzaSenderService.startActionBuildAndSendMessage(this, true, false, false)
-            return@setOnLongClickListener true
+
+            val v = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                v.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                //deprecated in API 26
+                v.vibrate(200)
+            }
+
+            Toast.makeText(this, getString(R.string.toast_sending), Toast.LENGTH_LONG).show()
+
+            return@setOnLongClickListener false
         }
 
 
