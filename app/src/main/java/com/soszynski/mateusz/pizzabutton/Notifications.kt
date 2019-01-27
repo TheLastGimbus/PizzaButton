@@ -119,7 +119,7 @@ class Notifications {
                 .setChannelId(APP_RUNNING_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_local_pizza_black_24dp)
                 .setContentTitle(context.getString(R.string.notification_title_foreground_running))
-                .setPriority(NotificationCompat.PRIORITY_MIN)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
         return builder.build()
     }
 
@@ -144,7 +144,7 @@ class Notifications {
         val appRunningChannel = NotificationChannel(
                 APP_RUNNING_CHANNEL_ID,
                 context.getString(R.string.notification_title_foreground_running),
-                NotificationManager.IMPORTANCE_MIN)
+                NotificationManager.IMPORTANCE_LOW)
         manager.createNotificationChannel(appRunningChannel)
     }
 
